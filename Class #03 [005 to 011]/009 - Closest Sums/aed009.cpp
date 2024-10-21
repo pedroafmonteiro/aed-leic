@@ -1,24 +1,39 @@
 #include <iostream>
 #include <set>
+#include <climits>
 
 using namespace std;
 
-int closestSum(const set<int> s, const int x) {
-    int closest = *s.begin() + *next(s.begin());
-    int minDiff = abs(x - closest);
+#include <vector>
+#include <algorithm>
 
-    for (auto it1 = s.begin(); it1 != s.end(); ++it1) {
-        for (auto it2 = next(it1); it2 != s.end(); ++it2) {
-            int sum = *it1 + *it2;
-            int diff = abs(x - sum);
-            if (diff < minDiff) {
-                minDiff = diff;
-                closest = sum;
-            }
+vector<int> closestSums(const set<int>& s, const int x) {
+    vector<int> sums;
+    int minDiff = INT_MAX;
+    set<int> uniqueSums;
+    vector<int> sortedS(s.begin(), s.end());
+
+    int left = 0, right = sortedS.size() - 1;
+    while (left < right) {
+        int sum = sortedS[left] + sortedS[right];
+        int diff = abs(x - sum);
+        if (diff < minDiff) {
+            minDiff = diff;
+            uniqueSums.clear();
+            uniqueSums.insert(sum);
+        } else if (diff == minDiff) {
+            uniqueSums.insert(sum);
+        }
+
+        if (sum < x) {
+            ++left;
+        } else {
+            --right;
         }
     }
 
-    return closest;
+    sums.assign(uniqueSums.begin(), uniqueSums.end());
+    return sums;
 }
 
 int main(int argc, char const *argv[])
@@ -35,7 +50,15 @@ int main(int argc, char const *argv[])
     for (int i = 0; i < q; i++) {
         int x;
         cin >> x;
-        cout << closestSum(numbersSet, x) << endl;
+        vector<int> sums = closestSums(numbersSet, x);
+        for (size_t j = 0; j < sums.size(); ++j) {
+            cout << sums[j];
+            if (j == sums.size() - 1) {
+            cout << endl;
+            } else {
+            cout << " ";
+            }
+        }
     }
     return 0;
 }
